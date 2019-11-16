@@ -11,7 +11,7 @@ const {
   addUser,
   removeUser,
   getUser,
-  getUserInRoom
+  getUsersInRoom
 } = require("./utils/users");
 
 const app = express();
@@ -46,7 +46,10 @@ io.on("connection", socket => {
         "message",
         generateMessage("Admin", `${user.username} has joined!`)
       );
-
+    io.to(user.room).emit("roomData", {
+      room: user.room,
+      users: getUsersInRoom(user.room)
+    });
     callback();
   });
 
@@ -83,6 +86,10 @@ io.on("connection", socket => {
         "message",
         generateMessage("Admin", `${user.username} has left`)
       );
+      io.to(user.room).emit("roomData", {
+        room: user.room,
+        users: getUsersInRoom(user.room)
+      });
     }
   });
 });
